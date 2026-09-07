@@ -63,9 +63,9 @@
   "bugs": {
     "url": "https://github.com/IsaacHatilima/CloudPeek/issues"
   },
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@10.33.3",
   "engines": {
     "node": ">=22.13.0",
-    "pnpm": "12.3.4"
+    "pnpm": "10.33.3"
   }
 }
