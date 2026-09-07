@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+bun.lock linguist-generated=true
+src/services/cloud-api/schema.d.ts linguist-generated=true
+src/services/cloud-api/write-operations.generated.ts linguist-generated=true
+contracts/laravel-cloud-openapi.json linguist-vendored=true

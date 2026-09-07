@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/IsaacHatilima/CloudPeek/discussions
+    about: Ask for help or discuss ideas before opening a change request.
+  - name: Private security report
+    url: https://github.com/IsaacHatilima/CloudPeek/security/advisories/new
+    about: Report vulnerabilities privately; never post credentials in an issue.
