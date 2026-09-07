@@ -1,5 +1,5 @@
 # Match Expo's default pnpm layout for native tooling and Metro.
 nodeLinker: hoisted
 # Preserve the previously approved native resolver build script.
-allowBuilds:
-  unrs-resolver: true
+onlyBuiltDependencies:
+  - unrs-resolver

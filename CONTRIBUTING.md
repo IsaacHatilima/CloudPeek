@@ -5,7 +5,7 @@ Bug reports, documentation, accessibility improvements, tests, and focused code 
 ## Development
 
 1. Fork the repository and clone your fork.
-2. Install Node.js 22.13+ and pnpm 12.3.4 (`npm install --global pnpm@12.3.4`; `.nvmrc` and `packageManager` pin the toolchain).
+2. Install Node.js 22.13+ and pnpm 10.33.3 (`npm install --global pnpm@10.33.3`; `.nvmrc` and `packageManager` pin the toolchain).
 3. Run `pnpm install --frozen-lockfile`.
 4. Create a branch from the current `master`, for example `git switch -c fix/date-format`.
 5. Run `pnpm run ios` on macOS with Xcode, or `pnpm run android` with the Android SDK. The native corner-surface module requires a development build.
@@ -33,4 +33,4 @@ New contributions are provided under the Cloud Peek Source Available License 1.0
 
 ## Dependency maintenance
 
-Dependabot groups compatible Expo runtime updates. Expo SDK major upgrades, React/React Native minor or major upgrades, and TypeScript major upgrades need a coordinated manual migration with toolchain and device validation. When updating Expo Router, check its Constants and Linking peer requirements as well as Expo SDK compatibility. CodeQL runs from the committed workflow on pull requests, pushes to `master`, and a weekly schedule; keep the required analysis job name stable.
+Dependabot groups compatible Expo runtime updates and only updates the lockfile within the version ranges already declared in `package.json`. It does not widen those ranges for routine updates. Expo SDK major upgrades, React/React Native minor or major upgrades, and TypeScript major upgrades need a coordinated manual migration with toolchain and device validation. When updating Expo Router, check its Constants and Linking peer requirements as well as Expo SDK compatibility. The pnpm version is pinned to the JavaScript-based 10.33.3 release because Dependabot's sandbox could not download pnpm 12's native executable. CodeQL runs from the committed workflow on pull requests, pushes to `master`, and a weekly schedule; keep the required analysis job name stable.

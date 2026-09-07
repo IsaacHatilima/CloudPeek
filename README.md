@@ -9,12 +9,12 @@ A mobile monitor for [Laravel Cloud](https://cloud.laravel.com), built with Expo
 
 ## Setup
 
-Use Node.js 22.13+ and pnpm 12.3.4. Native builds need Xcode on macOS for iOS or the Android SDK for Android. No credentials are needed to run the unit tests.
+Use Node.js 22.13+ and pnpm 10.33.3. Native builds need Xcode on macOS for iOS or the Android SDK for Android. No credentials are needed to run the unit tests.
 
 ```bash
 git clone https://github.com/IsaacHatilima/CloudPeek.git
 cd CloudPeek
-npm install --global pnpm@12.3.4
+npm install --global pnpm@10.33.3
 pnpm install --frozen-lockfile
 pnpm run ios       # development build in the iOS Simulator (needs Xcode)
 pnpm run android   # development build on Android
