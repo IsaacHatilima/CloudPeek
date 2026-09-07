@@ -1,22 +1,23 @@
 # Cloud Peek
 
 [![CI](https://github.com/IsaacHatilima/CloudPeek/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/IsaacHatilima/CloudPeek/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Source Available](https://img.shields.io/badge/License-Source_Available-blue.svg)](LICENSE)
 
-Independent community project; not affiliated with or endorsed by Laravel. Early development: see the known limitations below.
+Source-available community project; not affiliated with or endorsed by Laravel. Early development: see the known limitations below.
 
 A mobile monitor for [Laravel Cloud](https://cloud.laravel.com), built with Expo Router. Connect organizations using securely stored API tokens, browse their applications and environments, review resource details and billing, and manage resources through typed action forms.
 
 ## Setup
 
-Use Node.js 22.13+ and Bun 1.3.9. Native builds need Xcode on macOS for iOS or the Android SDK for Android. No credentials are needed to run the unit tests.
+Use Node.js 22.13+ and pnpm 12.3.4. Native builds need Xcode on macOS for iOS or the Android SDK for Android. No credentials are needed to run the unit tests.
 
 ```bash
 git clone https://github.com/IsaacHatilima/CloudPeek.git
 cd CloudPeek
-bun install --frozen-lockfile
-bun run ios       # development build in the iOS Simulator (needs Xcode)
-bun run android   # development build on Android
+npm install --global pnpm@12.3.4
+pnpm install --frozen-lockfile
+pnpm run ios       # development build in the iOS Simulator (needs Xcode)
+pnpm run android   # development build on Android
 ```
 
 The corner-surface native module needs a development build; Expo Go falls back to a fixed corner radius.
@@ -25,13 +26,13 @@ The corner-surface native module needs a development build; Expo Go falls back t
 
 | Script | What it does |
 | --- | --- |
-| `bun run typecheck` | `tsc --noEmit` |
-| `bun run lint` | `expo lint` (eslint-config-expo, with stale-closure, unused-var, and console rules promoted to errors) |
-| `bun run test` | Jest through `jest-expo`; tests live in `__tests__/` |
-| `bun run test:coverage` | Same, with the 80% threshold enforced on the logic modules |
-| `bun run validate` | All of the above |
-| `bun run test:live` | Read-only requests against the real API; needs `CLOUD_API_TEST_TOKEN` in the environment |
-| `bun run api:types` | Regenerates `src/services/cloud-api/schema.d.ts` from `contracts/laravel-cloud-openapi.json` |
+| `pnpm run typecheck` | `tsc --noEmit` |
+| `pnpm run lint` | `expo lint` (eslint-config-expo, with stale-closure, unused-var, and console rules promoted to errors) |
+| `pnpm run test` | Jest through `jest-expo`; tests live in `__tests__/` |
+| `pnpm run test:coverage` | Same, with the 80% threshold enforced on the logic modules |
+| `pnpm run validate` | All of the above |
+| `pnpm run test:live` | Read-only requests against the real API; needs `CLOUD_API_TEST_TOKEN` in the environment |
+| `pnpm run api:types` | Regenerates `src/services/cloud-api/schema.d.ts` from `contracts/laravel-cloud-openapi.json` |
 
 `tsconfig.json` lists `types: ["jest", "expo/types", "node"]` explicitly because TypeScript 6 no longer pulls `node_modules/@types` in on its own; Expo rewrites this file's `include` on first run, so keep it comment-free.
 
@@ -84,9 +85,9 @@ The last resource screen (including item and parent context) is saved alongside 
 
 ## The API layer
 
-- `contracts/laravel-cloud-openapi.json` is the vendored OpenAPI document; `bun run api:types` turns it into `schema.d.ts` (openapi-typescript), after sanitising three quirks in the document (empty property names, `null` entries in `required`, and discriminator mappings to schemas that do not exist).
+- `contracts/laravel-cloud-openapi.json` is the vendored OpenAPI document; `pnpm run api:types` turns it into `schema.d.ts` (openapi-typescript), after sanitising three quirks in the document (empty property names, `null` entries in `required`, and discriminator mappings to schemas that do not exist).
 - `createCloudApi({ token })` returns `{ client, list, get }`. `client` is an openapi-fetch instance typed for all 113 operations, writes included, e.g. `api.client.POST("/environments/{environment}/deployments", { params: { path: { environment } }, body })`. `list`/`get` are what the catalog-driven screens use, with the JSON:API envelope validated.
-- Reads are verified live by `bun run test:live` with a view-only token. With the test key used on 2026-09-05, 21 read endpoints answered; `/edge-networks` and `/secrets` returned 403 for that key (permission-scoped tokens), and environment logs require a `from`/`to` window, which the catalog supplies as the last hour.
+- Reads are verified live by `pnpm run test:live` with a view-only token. With the test key used on 2026-09-05, 21 read endpoints answered; `/edge-networks` and `/secrets` returned 403 for that key (permission-scoped tokens), and environment logs require a `from`/`to` window, which the catalog supplies as the last hour.
 - Applications have no status of their own, so the applications list asks for `include=environments` and shows a status derived from them (`running`, `1/2 running`, or the environments' state), with the same coloured dot the environment and deployment lists use.
 - Writes are typed and exposed through action forms. Unit tests use a fake fetch; live write operations have not been verified.
 
@@ -97,7 +98,7 @@ deprecated "Databases (Legacy)" routes excluded) has a screen:
 
 - `scripts/generate-cloud-api-operations.mjs` reduces each request body to a
   flat field list (`src/services/cloud-api/write-operations.generated.ts`,
-  regenerated by `bun run api:types`). Nested objects flatten one level
+  regenerated by `pnpm run api:types`). Nested objects flatten one level
   (`config.queue`); arrays of objects and `oneOf` configs become a JSON field
   with a sample document; the avatar upload is the one multipart body.
 - `src/features/actions/action-catalog.ts` assigns operations to side-menu
@@ -145,4 +146,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation, and pull requests,
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Existing third-party copyrights and terms are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Laravel and other third-party names and marks belong to their respective owners.
+Cloud Peek Source Available License 1.0 — see [LICENSE](LICENSE).
+
+- Personal use and internal use by teams and companies, including for-profit companies, are allowed.
+- Free, noncommercial redistribution and community forks are allowed, with the required notices.
+- Resale, paid distribution, bundling in paid offerings, and paid hosted access to Cloud Peek are not permitted without separate permission. Using Cloud Peek internally to operate your own paid products or services is allowed.
+
+This is source-available software, not OSI-approved open-source software. The license text controls; this summary is not a substitute for it. Versions through commit `a5f76af` remain available under their original [MIT license](licenses/CloudPeek-MIT-legacy.txt); the new terms do not revoke those grants. Third-party copyrights and licenses remain in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Laravel and other third-party names and marks belong to their respective owners.

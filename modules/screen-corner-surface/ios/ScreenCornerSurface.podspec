@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.description    = 'Uses the public iOS concentric corner API with a legacy fallback.'
   s.author         = 'CloudPeek'
   s.homepage       = 'https://github.com/IsaacHatilima/CloudPeek'
-  s.license        = { :type => 'MIT', :file => '../../../LICENSE' }
+  s.license        = { :type => 'Cloud Peek Source Available License 1.0', :file => '../../../LICENSE' }
   s.platforms      = { :ios => '16.4' }
   s.source         = { :git => 'https://github.com/IsaacHatilima/CloudPeek.git' }
   s.static_framework = true

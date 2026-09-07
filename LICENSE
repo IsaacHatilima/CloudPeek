@@ -1,16 +1,71 @@
-MIT License
+Cloud Peek Source Available License 1.0
 
 Copyright (c) 2026 Isaac Hatilima and contributors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Scope
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This license applies to the Cloud Peek software and documentation offered under
+these terms (the "Software"). Each copyright holder grants rights only to the
+material that holder has authority to license. Third-party material and material
+previously released under other licenses are addressed in section 6.
+
+2. Permitted use and modification
+
+Subject to these terms, you may obtain, inspect, run, reproduce, compile, and
+modify the Software for personal use or for the internal operations of a team,
+company, nonprofit, or other organization, including a for-profit organization.
+You may provide copies to employees and contractors acting on that organization's
+behalf solely for those internal operations. Internal use includes managing
+infrastructure that supports your own paid products or services; earning revenue
+from those products or services does not itself violate this license.
+
+3. Noncommercial redistribution
+
+You may redistribute the Software, including modified versions, in source or
+binary form without charge for noncommercial purposes. Free community forks,
+contributions, and mirrors are permitted. Such redistribution must include this
+license and applicable copyright and third-party notices. You must identify
+modified versions as modified and must not claim endorsement by the original
+copyright holders. You may license your own changes under these same terms; you
+may not grant recipients broader rights to the Software than you hold.
+
+4. No commercial distribution
+
+This license does not permit selling, renting, sublicensing for a fee, or otherwise
+commercially distributing the Software or modified versions. You may not bundle
+it into a paid product or subscription, charge for downloads or access to it, or
+offer its functionality to third parties as a paid hosted or managed service.
+Distributing it without a separate price as part of a paid offering is still
+commercial distribution. These restrictions apply to source and binary forms
+and cannot be avoided by renaming or modifying the Software.
+
+Internal use and internal copies expressly permitted by section 2 are not
+commercial distribution. Charging solely for independent consulting or support
+is permitted if it does not sell, bundle, or condition access to the Software.
+Commercial distribution requires separate permission from the relevant copyright
+holders; no such permission is granted by this license.
+
+5. Conditions and termination
+
+The permissions above are conditioned on compliance with this license. If you
+violate its terms, your permissions under this license terminate automatically.
+No trademark rights or other rights not expressly stated here are granted.
+Nothing in this license limits rights you have independently under applicable
+law or a separate license.
+
+6. Third-party material and earlier releases
+
+Third-party code, dependencies, and assets remain subject to their own licenses.
+See THIRD_PARTY_NOTICES.md and the notices accompanying those materials. This
+license does not restrict rights granted independently by those licenses.
+
+Cloud Peek versions published through commit
+a5f76af45ae2c9c31c76a505dc601d847906189a were offered under MIT. Their MIT grants
+are not revoked or replaced by this license. The original notice is preserved
+in licenses/CloudPeek-MIT-legacy.txt. These new terms apply to material offered
+under this license and do not retroactively restrict earlier MIT-licensed copies.
+
+7. Disclaimer
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -18,4 +73,4 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.

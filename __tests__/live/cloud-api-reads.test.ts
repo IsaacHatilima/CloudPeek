@@ -2,7 +2,7 @@
  * Live reads against Laravel Cloud with a view-only token. Runs only when
  * CLOUD_API_TEST_TOKEN is set:
  *
- *   CLOUD_API_TEST_TOKEN=... bun run test __tests__/live
+ *   CLOUD_API_TEST_TOKEN=... pnpm run test __tests__/live
  *
  * Read endpoints only: nothing here creates, changes, or deletes anything.
  * Parent-scoped lists (databases, keys, WebSocket applications, background

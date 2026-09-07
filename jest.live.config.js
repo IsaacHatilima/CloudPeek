@@ -1,4 +1,4 @@
-// Live read tests against Laravel Cloud (`bun run test:live`, needs
+// Live read tests against Laravel Cloud (`pnpm run test:live`, needs
 // CLOUD_API_TEST_TOKEN). They deliberately skip the jest-expo preset: React
 // Native's Jest setup replaces `fetch` with an XHR polyfill whose XHR is
 // mocked, so real requests never get a response there. Node's own `fetch`
