@@ -23,10 +23,14 @@ Connect your own Laravel Cloud organization through the app if you need live dat
 
 ## Before opening a pull request
 
-Run `bun run validate` (TypeScript, ESLint, and Jest with the coverage threshold). When API generation changes, also run `bun run api:types` and inspect its output. CI verifies generation is reproducible.
+Run `EXPO_OFFLINE=1 bunx expo install --check` and `bun run validate` (TypeScript, ESLint, and Jest with the coverage threshold). When API generation changes, also run `bun run api:types` and inspect its output. CI verifies generation is reproducible.
 
 Open the PR against `master`, link the related issue, describe the user-visible behavior and verification, and call out platform checks you could not run. Keep changes focused. Maintainers review contributions and squash merge them after required checks and review conversations are resolved. Do not run live writes against someone else's Cloud resources to verify a contribution.
 
 ## License and attribution
 
 Contributions are provided under the repository's MIT license. By submitting a contribution, you confirm that you have the right to license it under those terms. Preserve existing notices and document any third-party code, assets, and their licenses in `THIRD_PARTY_NOTICES.md`.
+
+## Dependency maintenance
+
+Dependabot groups compatible Expo runtime updates. Expo SDK major upgrades, React/React Native minor or major upgrades, and TypeScript major upgrades need a coordinated manual migration with toolchain and device validation. When updating Expo Router, check its Constants and Linking peer requirements as well as Expo SDK compatibility. CodeQL runs from the committed workflow on pull requests, pushes to `master`, and a weekly schedule; keep the required analysis job name stable.
