@@ -14,6 +14,8 @@ export { attributeRows } from "./attribute-presenter";
 
 /** Lists that hang off one item of another resource (chosen on screen, not in the header). */
 export const CHILD_RESOURCES: Readonly<Partial<Record<ResourceId, readonly ResourceId[]>>> = {
+  applications: ["environments"],
+  environments: ["deployments", "commands", "instances", "domains", "environment-logs"],
   "database-clusters": ["databases", "database-snapshots", "database-restores"],
   instances: ["background-processes"],
   "object-storage-buckets": ["bucket-keys"],

@@ -8,7 +8,7 @@ import { resolveScope } from "@/features/cloud-resources/scope";
 import { useCloudConnection } from "@/features/connections/use-cloud-api";
 import { ResourceSkeleton } from "@/features/resources/components/resource-skeleton";
 import { ResourceList } from "@/features/resources/components/resource-list";
-import { StateMessage } from "@/features/resources/components/state-message";
+import { ApiErrorState } from "@/features/resources/components/api-error-state";
 import {
   NotConnectedState,
   type ResourceDescriptor,
@@ -17,7 +17,7 @@ import {
 import { useResourceQuery } from "@/features/resources/use-resource-query";
 import { useShellNavigation } from "@/features/shell/hooks/use-shell-navigation";
 import { useWorkspaceSelection } from "@/features/workspace/use-workspace";
-import { describeApiError } from "@/services/cloud-api/client";
+import { isAuthenticationError } from "@/services/cloud-api/errors";
 import { useAppTheme } from "@/theme/use-app-theme";
 
 import { KeyValueList } from "./components/key-value-list";
@@ -84,13 +84,13 @@ function ConnectedReport({
     );
   }
   if (query.isPending) return <ResourceSkeleton colors={colors} />;
-  if (query.error && !query.data) {
+  if (query.error && (!query.data || isAuthenticationError(query.error))) {
     return (
-      <StateMessage
-        action={{ label: "Try again", onPress: () => void query.refetch() }}
-        body={describeApiError(query.error)}
+      <ApiErrorState
+        onRetry={() => void query.refetch()}
+        onConnect={onConnect}
+        error={query.error}
         colors={colors}
-        icon={descriptor.icon}
         title={`Could not load ${descriptor.label.toLowerCase()}`}
       />
     );

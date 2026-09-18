@@ -28,6 +28,24 @@ function sentRequest(fetchMock: jest.Mock): Request {
 const BASE = "https://cloud.test/api";
 
 describe("cloud api writes", () => {
+  it.each(WRITE_OPERATIONS)("routes $operationId to its documented method and encoded path", async (operation) => {
+    const fetchMock = respondWith(204);
+    const api = createCloudApi({ baseUrl: BASE, token: "test-token" }, fetchMock);
+    const params = Object.fromEntries(operation.params.map((name) => [name, `${name} id`]));
+    await api.request(operation, { params });
+    const request = sentRequest(fetchMock);
+    expect(request.method).toBe(operation.method);
+    expect(request.url).toBe(BASE + operation.path.replace(/\{([^}]+)\}/g, (_match, name: string) => encodeURIComponent(params[name])));
+    expect(request.headers.get("Authorization")).toBe("Bearer test-token");
+  });
+
+  it("rejects missing write path parameters before sending a malformed URL", async () => {
+    const fetchMock = respondWith(204);
+    const api = createCloudApi({ token: "test-token" }, fetchMock);
+    await expect(api.request(op("public.environments.stop"), { params: {} })).rejects.toThrow(/Missing required path param/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("posts a JSON body with the auth headers and returns the created resource", async () => {
     const created = { data: { attributes: { name: "new-app" }, id: "app_9", type: "applications" } };
     const fetchMock = respondWith(201, created);

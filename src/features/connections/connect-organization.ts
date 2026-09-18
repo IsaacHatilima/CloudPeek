@@ -10,7 +10,7 @@ import type { TokenVault } from "./token-vault";
 export type ConnectDependencies = {
   createApi: (config: CloudApiConfig) => Pick<CloudApi, "client">;
   /** Adds the organization to the workspace and selects it. */
-  register: (organization: OrganizationRef) => void;
+  register: (organization: OrganizationRef) => void | Promise<void>;
   vault: TokenVault;
 };
 
@@ -67,6 +67,6 @@ export async function connectOrganization(
   }
 
   await vault.setToken(organization.id, token);
-  register(organization);
+  await register(organization);
   return organization;
 }

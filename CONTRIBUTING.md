@@ -15,6 +15,7 @@ Connect your own Laravel Cloud organization through the app if you need live dat
 ## Project conventions
 
 - Routes in `src/app/` are thin wrappers; behavior belongs in feature modules.
+- Each side-menu resource has a named screen in `src/features/<resource>/<resource>-screen.tsx`, registered in `src/features/resources/resource-screens.ts`. Reuse the shared list/detail components in `features/resources`; keep resource-specific UI in its own feature folder.
 - Reuse semantic colors, typography, and controls. Support light/dark themes, accessibility labels, and reduced motion.
 - Keep display formatting separate from API payloads. Preserve original values for editing.
 - Add regression tests for behavior changes. For visual changes, check an actual simulator/device and attach sanitized screenshots, including relevant loading, empty, and error states.

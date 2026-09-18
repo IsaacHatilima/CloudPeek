@@ -6,6 +6,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { FAB_SIZE, FloatingActionButton } from "@/components/floating-action-button";
+import { ResourceScreen } from "@/features/resources/resource-screen";
 import { ScopeList } from "@/features/scope/components/scope-list";
 import { scopeLevelModel } from "@/features/scope/scope-model";
 import { useShellNavigation } from "@/features/shell/hooks/use-shell-navigation";
@@ -13,7 +14,15 @@ import { useConnectedOrganizations, useWorkspaceSelection } from "@/features/wor
 import { useWorkspaceStore } from "@/features/workspace/workspace-store";
 import { useAppTheme } from "@/theme/use-app-theme";
 
-export function OrganizationsScreen() {
+export function OrganizationScreen() {
+  return (
+    <ResourceScreen resourceId="organization">
+      <ConnectedOrganizations />
+    </ResourceScreen>
+  );
+}
+
+function ConnectedOrganizations() {
   const { colors } = useAppTheme();
   const organizations = useConnectedOrganizations();
   const selection = useWorkspaceSelection();

@@ -14,6 +14,8 @@ import {
 } from "../form-model";
 import { buildRequest } from "../form-request";
 import { type FormErrors, validateForm } from "../form-validation";
+import { databaseFormFields } from "../database-options";
+import { useDatabaseOptions } from "./use-database-options";
 import { useWriteAction } from "./use-write-action";
 
 const NO_ERRORS: FormErrors = {};
@@ -30,16 +32,19 @@ export function useActionForm(
 ) {
   const router = useRouter();
   const mutation = useWriteAction();
-  const fields = useMemo(() => formFields(op, route.params), [op, route.params]);
-  const [initial] = useState(() => initialValues(fields, prefill));
+  const baseFields = useMemo(() => formFields(op, route.params), [op, route.params]);
+  const [initial] = useState(() => initialValues(baseFields, prefill));
   const [values, setValues] = useState<FormValues>(initial);
+  const createsDatabase = op.operationId === "public.databases.clusters.store";
+  const options = useDatabaseOptions(createsDatabase);
+  const fields = useMemo(() => createsDatabase ? databaseFormFields(baseFields, values, options.data ?? []) : baseFields, [baseFields, createsDatabase, options.data, values]);
   const [submitted, setSubmitted] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const errors = useMemo(() => validateForm(fields, values), [fields, values]);
 
   const update = useCallback((name: string, value: FormValue) => {
-    setValues((current) => setValue(current, name, value));
-  }, []);
+    setValues((current) => setValue(createsDatabase && name === "type" ? { ...current, version: "", region: "" } : current, name, value));
+  }, [createsDatabase]);
 
   const submit = useCallback(async () => {
     setSubmitted(true);
@@ -58,6 +63,9 @@ export function useActionForm(
     failure,
     fields,
     pending: mutation.isPending,
+    optionsLoading: createsDatabase && options.isFetching,
+    optionsError: createsDatabase ? options.error : null,
+    reloadOptions: () => void options.refetch(),
     submit,
     update,
     values,

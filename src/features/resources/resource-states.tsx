@@ -45,26 +45,6 @@ export function UnknownResourceState({
   );
 }
 
-/** Database Restores: the menu keeps it, Cloud has nothing to list. */
-export function NoListEndpointState({
-  colors,
-  descriptor,
-  note,
-}: {
-  colors: ColorPalette;
-  descriptor: ResourceDescriptor;
-  note?: string;
-}) {
-  return (
-    <StateMessage
-      body={note}
-      colors={colors}
-      icon={descriptor.icon}
-      title={descriptor.label}
-    />
-  );
-}
-
 /**
  * The next thing to select: a shortcut to the scope sheet for organization,
  * application, and environment; for a parent picked on screen (an instance,

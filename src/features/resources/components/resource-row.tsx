@@ -38,7 +38,8 @@ export function ResourceRow({ colors, icon, onPress, row }: ResourceRowProps) {
 
   const style = [styles.card, { backgroundColor: colors.cardBackground }];
   return opens ? (
-    <Touchable accessibilityRole="button" onPress={onPress} style={style}>{content}</Touchable>
+    <Touchable accessibilityRole="button" accessibilityLabel={[row.title, row.subtitle, row.status].filter(Boolean).join(", ")}
+      accessibilityHint="Opens details and available actions" onPress={onPress} style={style}>{content}</Touchable>
   ) : <View style={style}>{content}</View>;
 }
 

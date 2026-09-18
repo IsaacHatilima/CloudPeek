@@ -12,7 +12,7 @@ import type { FormMode } from "./form-model";
 export const ACTION_PATHNAME = "/action";
 
 export type ActionRoute = {
-  /** The item an update prefills from; with `resourceId`, locates it in the cached list. */
+  /** The item an update prefills from through its documented detail endpoint. */
   itemId?: string;
   mode: FormMode;
   operationId: string;

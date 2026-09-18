@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   label: {
+    flex: 1,
+    paddingRight: 12,
     fontSize: 16,
     fontWeight: "600",
   },
