@@ -1,3 +1,3 @@
-import { OverviewScreen } from "@/features/overview/overview-screen";
+import { EnvironmentsScreen } from "@/features/environments/environments-screen";
 
-export default OverviewScreen;
+export default EnvironmentsScreen;

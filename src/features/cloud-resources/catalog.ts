@@ -227,7 +227,7 @@ export const RESOURCE_MENU: readonly ResourceMenuSection[] = [
           web: "settings_backup_restore",
         },
         endpoint: null,
-        note: "Laravel Cloud has no list endpoint for restores. The API only exposes POST /databases/clusters/{database}/restore, which creates a new database from a snapshot or a point in time (confirmed against the OpenAPI spec on 2026-09-05).",
+        note: "Create a new database cluster from a snapshot or a point in time. Choose the source cluster to begin. Existing clusters are unchanged.",
       },
     ],
   },

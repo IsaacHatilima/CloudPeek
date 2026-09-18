@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   chip: {
     borderCurve: "continuous",
     borderRadius: 999,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: "center",
     paddingHorizontal: 14,
   },
