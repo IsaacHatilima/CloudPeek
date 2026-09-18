@@ -10,14 +10,14 @@
 //     arrays of objects, and `oneOf` objects become a JSON field with a sample document.
 //   - `string` + `binary` format is a file; arrays of strings are string lists.
 //   - operations tagged "Databases (Legacy)" are skipped: Cloud marks them deprecated.
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
+import { readContract } from "./cloud-api-contract.mjs";
 
-const SOURCE = new URL("../contracts/laravel-cloud-openapi.json", import.meta.url);
 const TARGET = new URL("../src/services/cloud-api/write-operations.generated.ts", import.meta.url);
 const WRITE_METHODS = ["post", "patch", "put", "delete"];
 const SKIPPED_TAGS = new Set(["Databases (Legacy)"]);
 
-const spec = JSON.parse(readFileSync(SOURCE, "utf8"));
+const spec = readContract();
 const schemas = spec.components?.schemas ?? {};
 
 function resolve(node) {

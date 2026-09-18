@@ -1,7 +1,7 @@
 /**
  * `/action`: one form sheet for every Cloud write that needs input. The
  * operation and its known path params arrive as route params; an update also
- * names the item to prefill from, read out of the cached list. The root is
+ * names the item to prefill from, read from its detail endpoint. The root is
  * the ScrollView itself, which react-native-screens' form sheet requires.
  */
 import { useLocalSearchParams } from "expo-router";
@@ -11,8 +11,11 @@ import { findResource } from "@/features/cloud-resources/catalog";
 import { resolveScope } from "@/features/cloud-resources/scope";
 import type { CloudEndpoint } from "@/features/cloud-resources/types";
 import { useResourceItem } from "@/features/resources/detail/use-resource-item";
+import { StateMessage } from "@/features/resources/components/state-message";
+import { InlineNotice } from "@/components/inline-notice";
 import { useWorkspaceSelection } from "@/features/workspace/use-workspace";
 import type { WriteOperation } from "@/services/cloud-api/operation-types";
+import { describeApiError } from "@/services/cloud-api/client";
 import { typography } from "@/theme/design";
 import { useAppTheme } from "@/theme/use-app-theme";
 import type { ColorPalette } from "@/theme/types";
@@ -63,7 +66,8 @@ function PrefilledForm({
   const resolution = item ? resolveScope(item.scope, selection, route.parentId) : null;
 
   if (!item?.endpoint || !resolution?.satisfied) {
-    return <ActionForm colors={colors} op={op} route={route} />;
+    return <Sheet colors={colors}><StateMessage colors={colors} title="Select the resource first"
+      body="Close this form and select its organization and parent resource before editing." /></Sheet>;
   }
   return (
     <LoadedForm
@@ -101,8 +105,12 @@ function LoadedForm({
       </Sheet>
     );
   }
-  const prefill = state.kind === "ready" ? state.attributes : undefined;
-  return <ActionForm colors={colors} op={op} prefill={prefill} route={route} />;
+  if (state.kind !== "ready") {
+    return <Sheet colors={colors}><StateMessage colors={colors} title="Could not load current values"
+      body={state.kind === "error" ? describeApiError(state.error) : "Close this form and reconnect or refresh the resource before editing."}
+      action={"refetch" in state ? { label: "Try again", onPress: state.refetch } : undefined} /></Sheet>;
+  }
+  return <ActionForm colors={colors} op={op} prefill={state.attributes} route={route} />;
 }
 
 function ActionForm({
@@ -126,6 +134,8 @@ function ActionForm({
           {op.description}
         </Text>
       ) : null}
+      {form.optionsLoading ? <Text style={[typography.caption, { color: colors.muted }]}>Loading supported database versions…</Text> : null}
+      {form.optionsError ? <InlineNotice colors={colors} onPress={form.reloadOptions} message="Couldn’t load database versions. Tap to retry, or enter a supported version from Laravel Cloud." /> : null}
       {form.fields.map((field) => (
         <FormField
           colors={colors}

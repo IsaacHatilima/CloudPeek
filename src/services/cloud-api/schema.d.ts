@@ -601,6 +601,11 @@ export interface paths {
         /**
          * List database types
          * @description List all available database types with their configuration schemas.
+         *
+         *     Each type lists the versions a database may be created with; pass one of
+         *     them as `version` when creating a database. The retired types that baked
+         *     the version into the type are listed after them with no versions and
+         *     remain accepted when creating a database, for backwards compatibility.
          */
         get: operations["public.databases.types"];
         put?: never;
@@ -1704,7 +1709,7 @@ export interface components {
          * CloudRegion
          * @enum {string}
          */
-        CloudRegion: "us-east-2" | "us-east-1" | "ca-central-1" | "eu-central-1" | "eu-west-1" | "eu-west-2" | "me-central-1" | "ap-southeast-1" | "ap-southeast-2" | "ap-northeast-1";
+        CloudRegion: "us-east-1" | "us-east-2" | "ca-central-1" | "eu-central-1" | "eu-west-1" | "eu-west-2" | "me-central-1" | "ap-southeast-1" | "ap-southeast-2" | "ap-northeast-1";
         /** ClusterResource */
         ClusterResource: {
             attributes?: {
@@ -2149,7 +2154,7 @@ export interface components {
          * DatabaseType
          * @enum {string}
          */
-        DatabaseType: "laravel_mysql" | "aws_rds_mysql" | "aws_rds_postgres" | "neon_serverless_postgres" | "laravel_mysql_84" | "laravel_mysql_8" | "aws_rds_mysql_8" | "aws_rds_postgres_18" | "neon_serverless_postgres_18" | "neon_serverless_postgres_17" | "neon_serverless_postgres_16";
+        DatabaseType: "laravel_mysql" | "aws_rds_mysql" | "aws_rds_postgres" | "neon_serverless_postgres";
         /** DeleteEnvironmentVariablesRequest */
         DeleteEnvironmentVariablesRequest: {
             keys: string[];
@@ -2243,6 +2248,7 @@ export interface components {
                 origin_status: components["schemas"]["DomainStatus"];
                 redirect: components["schemas"]["DomainRedirect"] | null;
                 ssl_status: components["schemas"]["DomainStatus"];
+                stage: components["schemas"]["DomainStage"];
                 type: components["schemas"]["DomainType"];
                 wildcard: {
                     dns_records: {
@@ -2298,6 +2304,16 @@ export interface components {
             /** @enum {string} */
             type: "domains";
         };
+        /**
+         * DomainStage
+         * @description The stage of onboarding a domain is in.
+         *     | |
+         *     |---|
+         *     | `pre_verification` <br/> Ownership is being proven with temporary DNS records. |
+         *     | `origin` <br/> The domain is ready for its origin A/CNAME records. |
+         * @enum {string}
+         */
+        DomainStage: "pre_verification" | "origin";
         /**
          * DomainStatus
          * @enum {string}
@@ -2449,7 +2465,7 @@ export interface components {
          * FilesystemJurisdiction
          * @enum {string}
          */
-        FilesystemJurisdiction: "default" | "eu";
+        FilesystemJurisdiction: "default" | "eu" | "us";
         /**
          * FilesystemKeyPermission
          * @enum {string}
@@ -2893,8 +2909,9 @@ export interface components {
             };
             name: string;
             region: components["schemas"]["CloudRegion"];
-            /** @enum {string} */
-            type: "laravel_mysql_84" | "laravel_mysql_8" | "aws_rds_mysql_8" | "aws_rds_postgres_18" | "neon_serverless_postgres_18" | "neon_serverless_postgres_17" | "neon_serverless_postgres_16";
+            type: components["schemas"]["DatabaseType"];
+            /** @description Choose a version supported by the selected database type. */
+            version: string;
         };
         /** StoreDatabaseRestoreRequest */
         StoreDatabaseRestoreRequest: {
@@ -5404,6 +5421,7 @@ export interface operations {
                             label: string;
                             regions: string[];
                             type: string;
+                            versions: string[];
                         }[];
                     };
                 };

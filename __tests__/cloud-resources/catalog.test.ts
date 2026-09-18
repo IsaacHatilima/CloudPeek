@@ -94,7 +94,7 @@ describe("resource menu catalog", () => {
     const restores = findResource("database-restores");
 
     expect(restores?.endpoint).toBeNull();
-    expect(restores?.note).toMatch(/no list endpoint/i);
+    expect(restores?.note).toMatch(/snapshot or a point in time/i);
   });
 
   it("uses the endpoints confirmed against the OpenAPI spec", () => {

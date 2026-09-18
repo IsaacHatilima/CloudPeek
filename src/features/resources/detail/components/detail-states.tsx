@@ -1,9 +1,9 @@
 
 import type { CloudEndpoint, ResourceMenuItem } from "@/features/cloud-resources/types";
-import { describeApiError } from "@/services/cloud-api/client";
 import type { ColorPalette } from "@/theme/types";
 
 import { ResourceSkeleton } from "../../components/resource-skeleton";
+import { ApiErrorState } from "../../components/api-error-state";
 import { StateMessage } from "../../components/state-message";
 import { NotConnectedState } from "../../resource-states";
 import type { ResourceItemState } from "../use-resource-item";
@@ -44,11 +44,11 @@ export function DetailState({
       );
     case "error":
       return (
-        <StateMessage
-          action={{ label: "Try again", onPress: state.refetch }}
-          body={describeApiError(state.error)}
+        <ApiErrorState
+          onRetry={state.refetch}
+          onConnect={onConnect}
+          error={state.error}
           colors={colors}
-          icon={{ ios: "exclamationmark.triangle", android: "warning", web: "warning" }}
           title={`Could not load this ${item.label.toLowerCase()}`}
         />
       );
@@ -56,7 +56,7 @@ export function DetailState({
       return (
         <StateMessage
           action={{ label: "Refresh", onPress: state.refetch }}
-          body="It is not in the list Laravel Cloud returned. It may have been deleted, or it is past the first page."
+          body="Laravel Cloud could not find this item. It may have been deleted or become unavailable to this organization."
           colors={colors}
           icon={item.icon}
           title="Not found"

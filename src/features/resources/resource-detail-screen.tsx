@@ -1,6 +1,6 @@
 /**
- * `/resources/[resource]/[id]`: one item, read from the same cached list its
- * row came from, with its attributes, related lists, and write actions.
+ * `/resources/[resource]/[id]`: one item, loaded from its documented endpoint,
+ * with its attributes, related lists, and write actions.
  * Parent-scoped resources carry the parent's id in `?parent=`.
  */
 import { useLocalSearchParams } from "expo-router";
@@ -103,6 +103,7 @@ function ConnectedDetail({
       onRefresh={state.refetch}
       parentId={parentId}
       row={state.row}
+      refreshFailed={state.refreshFailed}
       scopeParams={scopeParams}
     />
   );
