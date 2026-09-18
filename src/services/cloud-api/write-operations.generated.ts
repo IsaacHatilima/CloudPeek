@@ -53,8 +53,8 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "required": true,
           "kind": "enum",
           "options": [
-            "us-east-2",
             "us-east-1",
+            "us-east-2",
             "ca-central-1",
             "eu-central-1",
             "eu-west-1",
@@ -662,8 +662,8 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "required": true,
           "kind": "enum",
           "options": [
-            "us-east-2",
             "us-east-1",
+            "us-east-2",
             "ca-central-1",
             "eu-central-1",
             "eu-west-1",
@@ -1041,14 +1041,21 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "required": true,
           "kind": "enum",
           "options": [
-            "laravel_mysql_84",
-            "laravel_mysql_8",
-            "aws_rds_mysql_8",
-            "aws_rds_postgres_18",
-            "neon_serverless_postgres_18",
-            "neon_serverless_postgres_17",
-            "neon_serverless_postgres_16"
+            "laravel_mysql",
+            "aws_rds_mysql",
+            "aws_rds_postgres",
+            "neon_serverless_postgres"
           ]
+        },
+        {
+          "description": "Choose a version supported by the selected database type.",
+          "name": "version",
+          "nullable": false,
+          "path": [
+            "version"
+          ],
+          "required": true,
+          "kind": "string"
         },
         {
           "maxLength": 40,
@@ -1071,8 +1078,8 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "required": true,
           "kind": "enum",
           "options": [
-            "us-east-2",
             "us-east-1",
+            "us-east-2",
             "ca-central-1",
             "eu-central-1",
             "eu-west-1",
@@ -2764,7 +2771,8 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "kind": "enum",
           "options": [
             "default",
-            "eu"
+            "eu",
+            "us"
           ]
         },
         {
@@ -3288,8 +3296,8 @@ export const WRITE_OPERATIONS: readonly WriteOperation[] = [
           "required": true,
           "kind": "enum",
           "options": [
-            "us-east-2",
             "us-east-1",
+            "us-east-2",
             "ca-central-1",
             "eu-central-1",
             "eu-west-1",

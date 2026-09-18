@@ -1,23 +1,20 @@
 /**
- * The screen behind every side-menu item, also reused by the Usage tab.
+ * Shared resource content used by the named feature screens.
  *
- * States, in the order they are checked: unknown id, a screen of its own
- * (organizations, usage, billing), no list endpoint, scope not yet selected,
+ * States, in the order they are checked: unknown id, no connections, custom
+ * content (organization, usage, billing), scope not yet selected, create-only resource,
  * no token for the organization, and then the fetched list (loading, failed,
  * empty, or rows).
  */
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { FloatingActionButton } from "@/components/floating-action-button";
-import { BillingScreen } from "@/features/billing/billing-screen";
 import { findResource } from "@/features/cloud-resources/catalog";
 import { resolveScope } from "@/features/cloud-resources/scope";
 import type { CloudEndpoint, ResourceMenuItem } from "@/features/cloud-resources/types";
-import { OrganizationsScreen } from "@/features/connections/organizations-screen";
 import { useCloudConnection } from "@/features/connections/use-cloud-api";
 import { useShellNavigation } from "@/features/shell/hooks/use-shell-navigation";
-import { UsageScreen } from "@/features/usage/usage-screen";
 import { useConnectedOrganizations, useWorkspaceSelection } from "@/features/workspace/use-workspace";
 import { useAppTheme } from "@/theme/use-app-theme";
 
@@ -25,23 +22,28 @@ import { WelcomePanel } from "@/features/connections/components/welcome-panel";
 import { ResourceSkeleton } from "./components/resource-skeleton";
 
 import { ResourceList } from "./components/resource-list";
+import { StateMessage } from "./components/state-message";
 import { presentRows } from "./presenters";
 import {
-  NoListEndpointState,
   NotConnectedState,
   ScopeRequiredState,
   UnknownResourceState,
 } from "./resource-states";
 import { useListNavigation } from "./use-list-navigation";
-import { useResourceQuery } from "./use-resource-query";
+import { useResourceListQuery } from "./use-resource-list-query";
 
-type ResourceScreenProps = {
+export type ResourceFeatureProps = {
   /** The parent chosen on screen for instance, cluster, and bucket scopes. */
   parentId?: string;
+};
+
+type ResourceScreenProps = ResourceFeatureProps & {
+  /** Reports and device-local resources supply their own content. */
+  children?: ReactNode;
   resourceId: string;
 };
 
-export function ResourceScreen({ parentId, resourceId }: ResourceScreenProps) {
+export function ResourceScreen({ children, parentId, resourceId }: ResourceScreenProps) {
   const { colors } = useAppTheme();
   const selection = useWorkspaceSelection();
   const organizations = useConnectedOrganizations();
@@ -50,15 +52,7 @@ export function ResourceScreen({ parentId, resourceId }: ResourceScreenProps) {
 
   if (!item) return <UnknownResourceState colors={colors} resource={resourceId} />;
   if (organizations.length === 0) return <WelcomePanel colors={colors} onConnect={openConnect} />;
-  // Organizations are connected on this device, not listed by the API.
-  if (item.id === "organization") return <OrganizationsScreen />;
-  // Usage and Billing are two readings of one report, not lists.
-  if (item.id === "usage") return <UsageScreen />;
-  if (item.id === "billing") return <BillingScreen />;
-  if (!item.endpoint) {
-    return <NoListEndpointState colors={colors} descriptor={item} note={item.note} />;
-  }
-
+  if (children !== undefined) return children;
   const resolution = resolveScope(item.scope, selection, parentId);
   if (!resolution.satisfied) {
     return (
@@ -72,6 +66,10 @@ export function ResourceScreen({ parentId, resourceId }: ResourceScreenProps) {
     );
   }
 
+  if (!item.endpoint) {
+    return <CreateOnlyResource item={item} params={resolution.params} parentId={parentId} />;
+  }
+
   return (
     <ConnectedResourceList
       endpoint={item.endpoint}
@@ -82,6 +80,13 @@ export function ResourceScreen({ parentId, resourceId }: ResourceScreenProps) {
       parentId={parentId}
     />
   );
+}
+
+function CreateOnlyResource({ item, params, parentId }: { item: ResourceMenuItem; params: Record<string, string>; parentId?: string }) {
+  const { colors } = useAppTheme();
+  const { create, openCreate } = useListNavigation(item, params, parentId);
+  return <StateMessage colors={colors} icon={item.icon} title={item.label} body={item.note}
+    action={create ? { label: create.summary, onPress: openCreate } : undefined} />;
 }
 
 function ConnectedResourceList({
@@ -101,7 +106,7 @@ function ConnectedResourceList({
 }) {
   const { colors } = useAppTheme();
   const { api, isLoading: isLoadingToken } = useCloudConnection();
-  const query = useResourceQuery(api, endpoint, params);
+  const query = useResourceListQuery(api, endpoint, params);
   const rows = useMemo(() => presentRows(query.data), [query.data]);
   const { create, openCreate, openItem } = useListNavigation(item, params, parentId);
 
@@ -129,8 +134,14 @@ function ConnectedResourceList({
         icon={item.icon}
         isLoading={query.isPending}
         isRefetching={query.isRefetching}
+        hasNextPage={query.hasNextPage}
+        isLoadingMore={query.isFetchingNextPage}
+        loadMoreFailed={query.isFetchNextPageError}
+        onLoadMore={() => void query.fetchNextPage()}
+        total={typeof query.data?.meta?.total === "number" ? query.data.meta.total : undefined}
         label={item.label}
         onPressRow={openItem}
+        onConnect={onConnect}
         onRefresh={() => void query.refetch()}
         rows={rows}
       />

@@ -1,7 +1,7 @@
 /**
  * Root layout. The swipe shell wraps the Stack, so the side menu is mounted
  * once underneath every screen and the Stack itself is the moving surface.
- * The overview (the selected application's environments) is the Stack's first
+ * The selected application's environments are the Stack's first
  * screen; resource lists push over it and an item's detail over those; the
  * scope picker, the connect form, and the action form are sheets and the
  * account screen is a modal, all presented natively above the shell.
@@ -22,12 +22,13 @@ import { StateMessage } from "@/features/resources/components/state-message";
 import { ShellLayout } from "@/features/shell";
 import { useNavigationPersistence } from "@/features/shell/hooks/use-navigation-persistence";
 import { useAppTheme } from "@/theme/use-app-theme";
+import { shouldRetryCloudQuery } from "@/services/cloud-api/errors";
 
 const ROOT_STYLE = { flex: 1 } as const;
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, staleTime: 60_000 },
+    queries: { retry: shouldRetryCloudQuery, staleTime: 60_000 },
   },
 });
 

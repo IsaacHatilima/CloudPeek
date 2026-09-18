@@ -16,9 +16,10 @@ import createClient, { type Middleware } from "openapi-fetch";
 
 import type { CloudEndpoint } from "@/features/cloud-resources/types";
 
-import { CLOUD_API_BASE_URL, type QueryParams } from "./build-path";
+import { buildPath, CLOUD_API_BASE_URL, type QueryParams } from "./build-path";
 import { CloudApiError, CloudApiNotConnectedError } from "./errors";
 import { toFormData } from "./multipart";
+import { mergePages, nextPageQuery } from "./pagination";
 import type { WriteOperation } from "./operation-types";
 import type { paths } from "./schema";
 import type { JsonApiSingle, ListEnvelope, ReportEnvelope } from "./types";
@@ -57,6 +58,8 @@ export type CloudApi = {
     params: Record<string, string>,
     query?: QueryParams,
   ): Promise<ListEnvelope>;
+  /** All pages for scope pickers and resources without a dedicated item endpoint. */
+  listAll(endpoint: CloudEndpoint, params: Record<string, string>, query?: QueryParams): Promise<ListEnvelope>;
   /**
    * One write operation (POST/PATCH/PUT/DELETE). Resolves with the parsed
    * response body, or undefined for an empty 204. A view-only token gets a 403.
@@ -162,9 +165,10 @@ export function createCloudApi(
   client.use(cloudMiddleware(config.token));
   const untyped = client as unknown as UntypedClient;
 
-  return {
+  const api: CloudApi = {
     client,
     async get(endpoint, params, query) {
+      buildPath(endpoint, params);
       const { data, response } = await untyped.GET(endpoint.path, {
         params: { path: params, query },
       });
@@ -172,18 +176,30 @@ export function createCloudApi(
       return data;
     },
     async list(endpoint, params, query) {
+      buildPath(endpoint, params);
       const { data, response } = await untyped.GET(endpoint.path, {
         params: { path: params, query },
       });
       if (!isListEnvelope(data, endpoint)) throw unexpectedShape(response.status, endpoint);
       return data;
     },
+    async listAll(endpoint, params, query = {}) {
+      const pages: ListEnvelope[] = [];
+      const visited = new Set<string>();
+      let next: QueryParams | undefined = query;
+      while (next && !visited.has(JSON.stringify(next))) {
+        visited.add(JSON.stringify(next));
+        const page = await api.list(endpoint, params, next);
+        pages.push(page);
+        next = nextPageQuery(page, next);
+      }
+      return mergePages(pages);
+    },
     async request(operation, input) {
+      buildPath(operation, input.params);
       const { data } = await untyped[operation.method](operation.path, writeInit(operation, input));
       return data;
     },
   };
+  return api;
 }
-
-/** Kept as an alias so callers can name it either way. */
-export const createCloudApiClient = createCloudApi;

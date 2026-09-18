@@ -6,7 +6,7 @@ export type QueryValue = boolean | number | string | undefined;
 export type QueryParams = Record<string, QueryValue>;
 
 export class MissingPathParamError extends Error {
-  constructor(param: string, endpoint: CloudEndpoint) {
+  constructor(param: string, endpoint: Pick<CloudEndpoint, "operationId" | "path">) {
     super(
       `Missing required path param "${param}" for ${endpoint.operationId} (${endpoint.path})`,
     );
@@ -20,7 +20,7 @@ export class MissingPathParamError extends Error {
  * Cloud's docs explicitly warn against.
  */
 export function buildPath(
-  endpoint: CloudEndpoint,
+  endpoint: Pick<CloudEndpoint, "operationId" | "params" | "path">,
   values: Record<string, string>,
 ): string {
   return endpoint.params.reduce((path, param) => {

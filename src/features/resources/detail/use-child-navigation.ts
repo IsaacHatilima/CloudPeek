@@ -5,6 +5,8 @@ import { actionHref } from "@/features/actions/action-route";
 import { resolveScope } from "@/features/cloud-resources/scope";
 import { childListPath } from "@/features/shell/resource-navigation";
 import { useWorkspaceSelection } from "@/features/workspace/use-workspace";
+import { useWorkspaceStore } from "@/features/workspace/workspace-store";
+import type { RowModel } from "../presenters";
 
 import type { ChildLink } from "./detail-model";
 
@@ -13,13 +15,18 @@ import type { ChildLink } from "./detail-model";
  * parent, or straight into the create form when the child has no list
  * (a cluster's restore).
  */
-export function useChildNavigation(itemId: string) {
+export function useChildNavigation(resourceId: string, row: RowModel) {
   const router = useRouter();
   const selection = useWorkspaceSelection();
+  const selectApplication = useWorkspaceStore((state) => state.selectApplication);
+  const selectEnvironment = useWorkspaceStore((state) => state.selectEnvironment);
 
   return useCallback(
     (link: ChildLink) => {
+      const itemId = row.id;
       if (link.listable) {
+        if (resourceId === "applications") selectApplication({ id: itemId, name: row.title, avatarUrl: row.avatar?.uri });
+        if (resourceId === "environments") selectEnvironment({ id: itemId, name: row.title, status: row.status });
         router.push(childListPath(link.item.id, itemId));
         return;
       }
@@ -30,6 +37,6 @@ export function useChildNavigation(itemId: string) {
         );
       }
     },
-    [itemId, router, selection],
+    [resourceId, row, router, selection, selectApplication, selectEnvironment],
   );
 }

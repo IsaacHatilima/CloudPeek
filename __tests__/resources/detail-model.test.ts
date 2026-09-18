@@ -101,8 +101,9 @@ describe("childLinks", () => {
       ["database-snapshots", true, "public.databases.clusters.snapshots.store"],
       ["database-restores", false, "public.databases.clusters.restore"],
     ]);
-    expect(childLinks("applications")).toEqual([]);
-    expect(Object.keys(CHILD_RESOURCES)).toHaveLength(4);
+    expect(childLinks("applications").map((link) => link.item.id)).toEqual(["environments"]);
+    expect(childLinks("environments").map((link) => link.item.id)).toEqual(["deployments", "commands", "instances", "domains", "environment-logs"]);
+    expect(Object.keys(CHILD_RESOURCES)).toHaveLength(6);
   });
 });
 

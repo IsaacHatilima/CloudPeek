@@ -10,6 +10,8 @@ import { ScrollView, StyleSheet, Text } from "react-native";
 
 import { PrimaryButton } from "@/components/primary-button";
 import { SearchField } from "@/components/search-field";
+import { InlineNotice } from "@/components/inline-notice";
+import { describeApiError, isAuthenticationError } from "@/services/cloud-api/errors";
 import { typography } from "@/theme/design";
 
 import { isScopeLevel } from "@/features/workspace/types";
@@ -37,17 +39,19 @@ export function ScopeScreen() {
     >
       <Text accessibilityRole="header" style={[typography.title, { color: colors.text }]}>{model.title}</Text>
       <ScopeCrumbs colors={colors} crumbs={model.crumbs} onSelect={picker.goTo} />
+      {picker.error ? <InlineNotice colors={colors} message={`${describeApiError(picker.error)} Tap to ${isAuthenticationError(picker.error) ? "reconnect" : "retry"}.`}
+        onPress={isAuthenticationError(picker.error) ? picker.connect : picker.retry} /> : null}
       {model.searchable ? (
         <SearchField colors={colors} label={searchLabel} onChange={picker.setSearch} value={picker.search} />
       ) : null}
-      <ScopeList
+      {!picker.error || model.items.length > 0 ? <ScopeList
         colors={colors}
         emptyMessage={model.emptyMessage}
         items={model.items}
         loading={picker.loading}
         onPick={picker.pick}
         selectedId={model.selectedId}
-      />
+      /> : null}
       {model.connectLabel ? (
         <PrimaryButton colors={colors} label={model.connectLabel} onPress={picker.connect} />
       ) : null}

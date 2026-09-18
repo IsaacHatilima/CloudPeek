@@ -2,6 +2,19 @@ import { memoryTokenStorage } from "@/features/connections/token-storage";
 import { createTokenVault } from "@/features/connections/token-vault";
 
 describe("token vault", () => {
+  it("does not replace a newly saved token when an earlier storage read finishes late", async () => {
+    let finishRead!: (token: string) => void;
+    const vault = createTokenVault({
+      read: () => new Promise((resolve) => { finishRead = resolve; }),
+      write: async () => {}, remove: async () => {},
+    });
+    const pending = vault.getToken("org_1");
+    await vault.setToken("org_1", "fresh-token");
+    finishRead("old-token");
+    await expect(pending).resolves.toBe("fresh-token");
+    await expect(vault.getToken("org_1")).resolves.toBe("fresh-token");
+  });
+
   it("reads a token through to storage once, then serves it from memory", async () => {
     const storage = memoryTokenStorage();
     storage.entries.set("org_1", "tok_1");
