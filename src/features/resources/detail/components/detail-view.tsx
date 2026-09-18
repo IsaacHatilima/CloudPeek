@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { RefreshControl, ScrollView, StyleSheet } from "react-native";
 
 import type { ResourceMenuItem } from "@/features/cloud-resources/types";
+import { InlineNotice } from "@/components/inline-notice";
 import type { ColorPalette } from "@/theme/types";
 
 import type { RowModel } from "../../presenters";
@@ -22,6 +23,7 @@ type DetailViewProps = {
   onRefresh: () => void;
   parentId?: string;
   row: RowModel;
+  refreshFailed: boolean;
   scopeParams: Readonly<Record<string, string>>;
 };
 
@@ -35,9 +37,10 @@ export function DetailView({
   onRefresh,
   parentId,
   row,
+  refreshFailed,
   scopeParams,
 }: DetailViewProps) {
-  const openChild = useChildNavigation(itemId);
+  const openChild = useChildNavigation(item.id, row);
   const rows = useMemo(() => attributeRows(attributes), [attributes]);
   const links = useMemo(() => childLinks(item.id), [item.id]);
   const { actions, runningId, trigger } = useDetailActions({
@@ -57,11 +60,12 @@ export function DetailView({
       }
     >
       <DetailHeader colors={colors} icon={item.icon} row={row} />
-      {rows.length > 0 ? <AttributeRows colors={colors} rows={rows} /> : null}
+      {refreshFailed ? <InlineNotice colors={colors} onPress={onRefresh} message="Couldn’t refresh. Showing saved details. Tap to retry." /> : null}
       {links.length > 0 ? <ChildRows colors={colors} links={links} onPress={openChild} /> : null}
       {actions.length > 0 ? (
         <ActionRows actions={actions} colors={colors} onPress={trigger} runningId={runningId} />
       ) : null}
+      {rows.length > 0 ? <AttributeRows colors={colors} rows={rows} /> : null}
     </ScrollView>
   );
 }

@@ -45,7 +45,7 @@ src/
 │   ├── index.tsx             The first screen: the selected application's environments
 │   ├── account.tsx           Account modal (avatar button, top right)
 │   ├── connect.tsx           Form sheet: paste an organization's API token
-│   ├── resources/[resource]  One route for every resource type in the side menu
+│   ├── resources/[resource]  Resolves a named feature screen; [id] uses the shared detail screen
 │   └── scope.tsx             Form sheet: one drill-down for organization › application › environment
 ├── theme/                    brand.ts (named colour tokens) › palettes.ts › use-app-theme.ts
 ├── features/
@@ -53,12 +53,25 @@ src/
 │   ├── scope/                The header's scope breadcrumb and the drill-down scope sheet (models are pure and tested)
 │   ├── cloud-resources/      Side-menu catalog (sections › items › Cloud endpoints) and scope rules
 │   ├── workspace/            Active organization/application/environment (zustand, persisted)
-│   ├── resources/            The generic resource screen and its state views
-│   └── overview/, usage/, billing/, account/   The first screen, the two report screens, and the account modal
+│   ├── applications/         applications-screen.tsx
+│   ├── environments/         environments-screen.tsx (also the first screen at /)
+│   ├── deployments/, commands/, instances/, …   One named folder and screen per menu resource
+│   ├── organization/         Connected organizations on this device
+│   ├── usage/, billing/      The two report screens
+│   ├── account/              Account modal
+│   ├── connections/          Per-organization tokens (keychain), the connect flow
+│   └── resources/            Shared list/detail UI, states, queries, and feature screen registry
 ├── services/cloud-api/       Typed openapi-fetch client for every Cloud operation, plus list/get helpers
-├── features/connections/     Per-organization tokens (keychain), the connect flow
 └── lib/                      expo-file-system storage adapter for zustand persist
 ```
+
+### Finding a screen
+
+Every side-menu resource has a matching `src/features/<resource>/<resource>-screen.tsx` entry point. For example, Applications is in `src/features/applications/applications-screen.tsx`, Environments is in `src/features/environments/environments-screen.tsx`, and Database Snapshots is in `src/features/database-snapshots/database-snapshots-screen.tsx`.
+
+`src/features/resources/resource-screens.ts` maps every resource ID to its feature screen. The dynamic list route resolves that registry; `/` directly renders `EnvironmentsScreen`. The named screens compose `resources/resource-screen.tsx`, which handles connection/scope states and the shared list UI. Usage, Billing, and Organization supply custom content through the same connection guard. Item details still share `resources/resource-detail-screen.tsx` and `resources/detail/`; their routes remain `/resources/<resource>/<id>`.
+
+The API endpoints, icons, labels, and menu grouping remain in `cloud-resources/catalog.ts`. Start a resource-specific screen change in its feature folder; change the shared resource components when it should apply to every resource. Adding a resource requires a catalog entry, a named screen, and a registry entry; TypeScript checks registry coverage against `ResourceId`.
 
 - **The shell wraps the Stack.** The side menu is mounted once underneath a single moving surface; the Stack navigator is that surface, and its first screen is the selected application's environments. There is no bottom tab bar: every screen has the same header and menu, and Usage and Billing are side-menu items like everything else. Menu items push (from the first screen) or replace (between pushed resources), so the stack stays shallow; an item's detail pushes over its list and the header's menu button becomes a back button there. Swipe-back on the Stack is disabled because it is the same motion as opening the menu.
 - **Workspace state** (`useWorkspaceStore`) holds the connected organizations, the catalogs for the active organization and application, and the selection. Switching organization resets application and environment; switching application resets environment. The selection and the organization list persist to the document directory, so the app reopens where it was left.
@@ -68,12 +81,12 @@ src/
 
 ## Laravel Cloud API facts the shell relies on
 
-Verified against the docs and the OpenAPI document (`https://cloud.laravel.com/api-docs/api.json`) on 2026-09-05:
+Compared with the [official docs](https://laravel.com/cloud/docs/api/introduction) and refreshed OpenAPI document (`https://cloud.laravel.com/api-docs/api.json`) on 2026-09-18. See [API coverage](docs/api-coverage.md) for supported routes and verification limits.
 
 - Base URL `https://cloud.laravel.com/api`, `Authorization: Bearer <token>`, JSON:API responses (`data`, `links`, `meta`).
 - API tokens are created per organization and there is no endpoint listing a user's organizations. Cloud Peek therefore models "connected organizations", one token each; `GET /meta/organization` resolves a token to its organization.
 - Environments belong to applications: `GET /applications/{application}/environments`.
-- Database Restores has no list endpoint (only `POST /databases/clusters/{database}/restore`). The menu item explains this instead of listing.
+- Database Restores has no list endpoint (only `POST /databases/clusters/{database}/restore`). Select the source cluster to open its restore form.
 
 ## Connecting an organization
 
@@ -85,8 +98,9 @@ The last resource screen (including item and parent context) is saved alongside 
 
 ## The API layer
 
-- `contracts/laravel-cloud-openapi.json` is the vendored OpenAPI document; `pnpm run api:types` turns it into `schema.d.ts` (openapi-typescript), after sanitising three quirks in the document (empty property names, `null` entries in `required`, and discriminator mappings to schemas that do not exist).
-- `createCloudApi({ token })` returns `{ client, list, get }`. `client` is an openapi-fetch instance typed for all 113 operations, writes included, e.g. `api.client.POST("/environments/{environment}/deployments", { params: { path: { environment } }, body })`. `list`/`get` are what the catalog-driven screens use, with the JSON:API envelope validated.
+- `contracts/laravel-cloud-openapi.json` is the vendored OpenAPI document; `pnpm run api:types` generates the types and action fields. Generators correct known schema quirks in memory, including the empty database-version enum; the downloaded document stays intact. Database creation loads supported versions and regions from `/databases/types`.
+- `createCloudApi({ token })` returns `{ client, list, listAll, get, request }`. `client` is typed for all 113 operations. Lists support page and cursor pagination with Load more; scope pickers load every page. Item details use the 15 documented item endpoints, falling back to all list pages for resources without one. Transport errors and invalid envelopes are rejected.
+- Reconnecting replaces the cached token before selecting the organization and clears old resource reads. Authentication failures offer Reconnect; HTTP 401/403/404/422 responses are not automatically retried. Failed edit-prefill requests do not open blank update forms.
 - Reads are verified live by `pnpm run test:live` with a view-only token. With the test key used on 2026-09-05, 21 read endpoints answered; `/edge-networks` and `/secrets` returned 403 for that key (permission-scoped tokens), and environment logs require a `from`/`to` window, which the catalog supplies as the last hour.
 - Applications have no status of their own, so the applications list asks for `include=environments` and shows a status derived from them (`running`, `1/2 running`, or the environments' state), with the same coloured dot the environment and deployment lists use.
 - Writes are typed and exposed through action forms. Unit tests use a fake fetch; live write operations have not been verified.
@@ -128,7 +142,7 @@ a view-only token; no write was sent to Laravel Cloud during those checks.
 ## What is still open
 
 - Sign-in beyond pasting a token (no OAuth exists for Cloud's API).
-- Pagination past the first page (an item past it shows "Not found" on its detail screen).
+- Ten supplementary GET endpoints do not yet have UI: metrics, deployment logs, failed-job listings, cache types, instance sizes, and the secrets public key. See [the full list](docs/api-coverage.md).
 - Writes have not been verified against Laravel Cloud with a write-enabled token.
 - Arrays of objects (environment variables, bucket attachments, a database's `config`) are edited as JSON text rather than as structured rows.
 - The account screen lists connected organizations; disconnecting one is not exposed in the UI yet.

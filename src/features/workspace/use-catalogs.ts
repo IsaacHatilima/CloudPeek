@@ -22,7 +22,7 @@ export function useApplicationsCatalog(api: CloudApi | null) {
     enabled: api !== null && organization !== null,
     queryFn: () => {
       if (!api) throw new CloudApiNotConnectedError();
-      return api.list(endpointFor("applications"), {});
+      return api.listAll(endpointFor("applications"), {});
     },
     queryKey: ["cloud", organization?.id, "catalog", "applications"],
   });
@@ -42,7 +42,7 @@ export function useEnvironmentsCatalog(api: CloudApi | null) {
     enabled: api !== null && application !== null,
     queryFn: () => {
       if (!api || !application) throw new CloudApiNotConnectedError();
-      return api.list(endpointFor("environments"), { application: application.id });
+      return api.listAll(endpointFor("environments"), { application: application.id });
     },
     queryKey: ["cloud", organization?.id, "catalog", "environments", application?.id],
   });

@@ -45,6 +45,9 @@ export function useScopePicker(requested: ScopeLevel | null) {
   const loading =
     (model.level === "application" && applicationsQuery.isFetching) ||
     (model.level === "environment" && environmentsQuery.isFetching);
+  const activeQuery = model.level === "application" ? applicationsQuery : model.level === "environment" ? environmentsQuery : null;
+  const error = activeQuery?.error ?? null;
+  const retry = () => void activeQuery?.refetch();
 
   const goTo = useCallback((next: ScopeLevel) => {
     setLevel(next);
@@ -66,5 +69,5 @@ export function useScopePicker(requested: ScopeLevel | null) {
 
   const connect = useCallback(() => router.push("/connect"), [router]);
 
-  return { connect, goTo, loading, model, pick, search, setSearch } as const;
+  return { connect, error, goTo, loading, model, pick, retry, search, setSearch } as const;
 }
