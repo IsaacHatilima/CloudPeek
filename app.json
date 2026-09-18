@@ -26,6 +26,14 @@
       "expo-router",
       "expo-secure-store",
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Cloud Peek uses your photo library to pick an application avatar."
