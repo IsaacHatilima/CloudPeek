@@ -22,6 +22,10 @@ pnpm run android   # development build on Android
 
 The corner-surface native module needs a development build; Expo Go falls back to a fixed corner radius.
 
+For a standalone installation on a connected iPhone, run `pnpm exec expo run:ios --device --configuration Release`. This bundles the JavaScript so the app can launch without Metro running on your Mac.
+
+The app enables Expo SDK 57's [scene lifecycle support](https://github.com/expo/fyi/blob/main/ios-scene-lifecycle.md#staying-on-sdk-57-with-xcode-27) through `expo-build-properties` in `app.json`, as required for builds made with Xcode 27. After changing native dependencies or config plugins, regenerate the ignored iOS project with `pnpm exec expo prebuild --platform ios`, then rebuild the app; refreshing JavaScript alone cannot apply these changes. Keep local signing settings backed up before regenerating.
+
 ## Scripts
 
 | Script | What it does |
